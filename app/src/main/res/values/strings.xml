@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Wifi</string>
+    <string name="show">开始扫描</string>
+    <string name="result">结果如下:</string>
+    <string name="ap_x">AP_A:</string>
+    <string name="ap_y">AP_B:</string>
+    <string name="ap_z">AP_C:</string>
+    <string name="ap_w">AP_D:</string>
+    <string name="fresh">fresh</string>
+    <string name="pre_result">预测地点：</string>
+</resources>
