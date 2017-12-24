@@ -24,6 +24,12 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity {
 
 
+    //真实距离到显示屏幕的距离
+    double scaling_factor = 1;
+
+    //view 的 宽:w和高:h
+    int w = 200;
+    int h = 100;
     //提供的4个AP
     private static final String AccessPoint_A = "AC_A";
 
@@ -200,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
+    //注册广播，用于监听WIFI
     private void registerBroadcast()
 
     {
@@ -212,7 +218,6 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(mReceiver, filter);
 
     }
-
 
 
     private void show_info(String[] tem)
@@ -231,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private int[] hand_xyzw(String[] string) {
+    private int[] sting2int(String[] string) {
 
         int tems[] = new int[4];
 
@@ -247,17 +252,35 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private double[] strength2view(int[] strength){
+        double view_distance[] = new double[4];
+        for(int i = 0; i <= 3; ++i){
+            view_distance[i] = scaling_factor * strength2distance(strength[i]);
+        }
+        return  view_distance;
+    }
+
+    private int strength2distance(int s){
+        int tem = 0;
+        //TODO: switch the strength to distance eg, wifi 100 map 1 m
+        return tem;
+    }
 
 
-    private int[] get_xy(int x, int y, int z, int w)
 
-    {
+    /**
+     * @param x:改点离AP点A的大致距离
+     * @param y:该点离AP点B的大致距离
+     * @param z:该点离AP点C的大致距离
+     * @param w:该点离AP点D的大致距离
+     * @return int[2], 改点再view中的位置坐标
+     * */
+    private int[] get_xy(int x, int y, int z, int w) {
+        int xy[] = new int[2];
+        int temx = 0, temy = 0;
+        //利用A，D点画圆求交，B点进行选点
 
-        int xy[]=new int[2];
 
-        xy[0] = x+z+w;
-
-        xy[1] = x+y+w;
 
         return xy;
 
@@ -265,9 +288,12 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private String[] filt_info(List<ScanResult> resultList)
+    private String[] filt_info(List<ScanResult> resultList){
 
-    {
+        /**
+        * @param resultList:wifi 扫描的结果
+        * @return tem:提取wifi扫描结果中的4个AP点的强度信息，并转换成字符串
+        * */
 
         String tem[] = new String[4];
 
@@ -319,9 +345,11 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public BroadcastReceiver mReceiver = new BroadcastReceiver()
+    public BroadcastReceiver mReceiver = new BroadcastReceiver(){
 
-    {
+        /**
+         * 监听wifi广播，一旦扫描到wifi的结果就调用onReceive
+         * */
 
         @Override
 
@@ -341,7 +369,7 @@ public class MainActivity extends AppCompatActivity {
 
                 //更新view中的X，Y；
 
-                int tems[] = hand_xyzw(tem);
+                int tems[] = sting2int(tem);
 
                 int tem_xy[] = get_xy(tems[0], tems[1], tems[2], tems[3]);
 
@@ -349,9 +377,9 @@ public class MainActivity extends AppCompatActivity {
 
                 message.what = 0x123;
 
-                message.arg1= tem_xy[0] ;//tem_xy[0];
+                message.arg1= tem_xy[0] ;
 
-                message.arg2 = tem_xy[1];//tem_xy[1];
+                message.arg2 = tem_xy[1];
 
 
                 drawView.handler.sendMessage(message);
