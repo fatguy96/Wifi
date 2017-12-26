@@ -28,8 +28,8 @@ public class MainActivity extends AppCompatActivity {
     double scaling_factor = 1;
 
     //view 的 宽:w和高:h
-    int w = 200;
-    int h = 100;
+    int view_w= 200;
+    int view_h = 100;
     //提供的4个AP
     private static final String AccessPoint_A = "AC_A";
 
@@ -277,11 +277,21 @@ public class MainActivity extends AppCompatActivity {
      * */
     private int[] get_xy(int x, int y, int z, int w) {
         int xy[] = new int[2];
-        int temx = 0, temy = 0;
-        //利用A，D点画圆求交，B点进行选点
-
-
-
+        double temx = 0, temy = 0;
+        //利用A，B点画圆求交，D点进行选点
+        //(XA^2-XB^2+view_w^2)/(2*view_w)
+        temx = (Math.pow((double)x, 2.0)-Math.pow((double)y, 2.0)+Math.pow(w, 2.0))/(2*view_w);
+        temy = Math.pow((double)x, 2.0) - Math.pow(temx, 2.0);
+        //temy 交点坐标的绝对值
+        temy = Math.sqrt(temy);
+        //通过代入第三点D，进行比较得出比较理想的值
+        double one = Math.pow(temx, 2.0) + Math.pow((temy - view_h), 2.0);
+        double two = Math.pow(temx, 2.0) + Math.pow((temy + view_h), 2.0);
+        if (Math.abs(one - w ) > Math.abs(two - w)){
+            temy = - temy;
+        }
+        xy[0] = (int)temx;
+        xy[1] = (int)temy;
         return xy;
 
     }
