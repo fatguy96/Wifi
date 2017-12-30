@@ -269,29 +269,91 @@ public class MainActivity extends AppCompatActivity {
 
 
     /**
-     * @param x:改点离AP点A的大致距离
-     * @param y:该点离AP点B的大致距离
-     * @param z:该点离AP点C的大致距离
-     * @param w:该点离AP点D的大致距离
+     * 预设定的布局：
+     *              view_w
+     *      (0, 0)A----------------------------B(view_w, 0)
+     *            \                            \
+     *            \                            \
+     *            \             X(x, y)        \ view_h
+     *            \                            \
+     *            \                            \
+     * (0, view_h)D----------------------------C(view_w, view_h)
+     * @param SA:改点离AP点A的大致距离
+     * @param SB:该点离AP点B的大致距离
+     * @param SC:该点离AP点C的大致距离
+     * @param SD:该点离AP点D的大致距离
      * @return int[2], 改点再view中的位置坐标
      * */
-    private int[] get_xy(int x, int y, int z, int w) {
+    private int[] get_xy(int SA, int SB, int SC, int SD) {
         int xy[] = new int[2];
-        double temx = 0, temy = 0;
+        double temx1,temx2, temx3, temy1, temy2, temy3;
+        int count = 0; //有效交点的个数
+
         //利用A，B点画圆求交，D点进行选点
-        //(XA^2-XB^2+view_w^2)/(2*view_w)
-        temx = (Math.pow((double)x, 2.0)-Math.pow((double)y, 2.0)+Math.pow(w, 2.0))/(2*view_w);
-        temy = Math.pow((double)x, 2.0) - Math.pow(temx, 2.0);
-        //temy 交点坐标的绝对值
-        temy = Math.sqrt(temy);
-        //通过代入第三点D，进行比较得出比较理想的值
-        double one = Math.pow(temx, 2.0) + Math.pow((temy - view_h), 2.0);
-        double two = Math.pow(temx, 2.0) + Math.pow((temy + view_h), 2.0);
-        if (Math.abs(one - w ) > Math.abs(two - w)){
-            temy = - temy;
+        if ( (SA + SB) > view_w){ //确保有交点
+            //x=(SA^2-SB^2+view_w^2)/(2*view_w)
+            temx1 = (Math.pow((double) SA, 2.0) - Math.pow((double) SB, 2.0) + Math.pow(view_w, 2.0)) / (2 * view_w);
+            temy1 = Math.pow((double) SA, 2.0) - Math.pow(temx1, 2.0);
+
+            double one = Math.pow(temx1, 2.0) + Math.pow((temy1 - view_h), 2.0);
+            double two = Math.pow(temx1, 2.0) + Math.pow((temy1 + view_h), 2.0);
+            if (Math.abs(one - view_w ) > Math.abs(two - view_w)){
+                temy1 = - temy1;
+            }else{
+                temy1 = temy1;
+            }
+            ++count;
         }
-        xy[0] = (int)temx;
-        xy[1] = (int)temy;
+
+        //利用A，C点画圆求交，B确定位置
+        if ( Math.pow((SA + SC),2) > Math.pow(view_w, 2) + Math.pow(view_h, 2)){//确保有交点
+            double t = Math.pow(SA, 2) + Math.pow(view_w, 2) + Math.pow(view_h, 2) - Math.pow(SC, 2);
+            double a = 4 * (Math.pow(view_w, 2) + Math.pow(view_h, 2));
+            double b = -4 * view_h * t;
+            double c = Math.pow(t, 2) - 4 * (Math.pow((2 * view_w * SA), 2));
+            //a *  y^2 + b * y + c = 0
+            double delte = Math.pow(b, 2) - 4 * a * c;
+            if(delte >= 0 ){
+                double y1 = (-b + Math.sqrt(delte))/(2 * b);
+                double y2 = (-b - Math.sqrt(delte))/(2 * b);
+                double x1 = 0,x2 = 0;
+                if ( y1 > 0){
+                    x1  = Math.sqrt(Math.pow(SA, 2) - Math.pow(y1, 2));
+                }
+                if (y2 > 0){
+                    x2 = Math.sqrt(Math.pow(SA, 2) - Math.pow(y2, 2));
+                }
+                //有交点
+                if (y1>0||y2>0){
+                    ++count;
+                }
+                if(y1 > 0 & y2 >0){
+                    double one = Math.pow(x1 - view_w, 2.0) + Math.pow(y1, 2.0);
+                    double two = Math.pow(x2 - view_w, 2.0) + Math.pow(y2, 2.0);
+                    if (Math.abs(one - SB ) > Math.abs(two - SB)){
+                        temy2 = y1;
+                        temx2 = x1;
+                    }else {
+                        temy2 = y2;
+                        temx2 = x2;
+                    }
+                }else if(y1 < 0 ){
+                    temx2 = x2;
+                    temy2 = y2;
+                }else{
+                    temx2 = x1;
+                    temy2 = y1;
+                }
+            }
+        }
+
+        //用B，D画圆 ，C确定位置
+
+
+
+
+
+
         return xy;
 
     }
