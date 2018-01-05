@@ -25,6 +25,11 @@ public class MainActivity extends AppCompatActivity {
 
 
     //真实距离到显示屏幕的距离
+    /***
+     * TODO：获取自定义view的长宽，计算合适的比例因子
+     * TODO：最好在自定义view中描绘出这4个点
+     */
+
     double scaling_factor = 1;
 
     //view 的 宽:w和高:h
@@ -220,9 +225,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void show_info(String[] tem)
-
-    {
+    private void show_info(String[] tem) {
 
         ap_x.setText(tem[0]);
 
@@ -233,8 +236,6 @@ public class MainActivity extends AppCompatActivity {
         ap_w.setText(tem[3]);
 
     }
-
-
 
     private int[] sting2int(String[] string) {
 
@@ -263,6 +264,9 @@ public class MainActivity extends AppCompatActivity {
     private int strength2distance(int s){
         int tem = 0;
         //TODO: switch the strength to distance eg, wifi 100 map 1 m
+        if(s<100){
+
+        }
         return tem;
     }
 
@@ -286,27 +290,28 @@ public class MainActivity extends AppCompatActivity {
      * */
     private int[] get_xy(int SA, int SB, int SC, int SD) {
         int xy[] = new int[2];
-        double temx1,temx2, temx3, temy1, temy2, temy3;
+        double temx1 = 0,temx2 = 0, temx3 = 0, temy1= 0, temy2 = 0, temy3 = 0;
         int count = 0; //有效交点的个数
 
         //利用A，B点画圆求交，D点进行选点
-        if ( (SA + SB) > view_w){ //确保有交点
+        if ( (SA + SB) > view_w && SA < view_w && SB < view_w){ //确保有交点且交点落在区域内
             //x=(SA^2-SB^2+view_w^2)/(2*view_w)
             temx1 = (Math.pow((double) SA, 2.0) - Math.pow((double) SB, 2.0) + Math.pow(view_w, 2.0)) / (2 * view_w);
             temy1 = Math.pow((double) SA, 2.0) - Math.pow(temx1, 2.0);
 
+            //其实下面的代码没有必要，只需要取正数就行
             double one = Math.pow(temx1, 2.0) + Math.pow((temy1 - view_h), 2.0);
             double two = Math.pow(temx1, 2.0) + Math.pow((temy1 + view_h), 2.0);
-            if (Math.abs(one - view_w ) > Math.abs(two - view_w)){
-                temy1 = - temy1;
-            }else{
-                temy1 = temy1;
+            if (Math.abs(one - SD ) > Math.abs(two - SD)) {
+                temy1 = -temy1;
             }
             ++count;
         }
 
         //利用A，C点画圆求交，B确定位置
-        if ( Math.pow((SA + SC),2) > Math.pow(view_w, 2) + Math.pow(view_h, 2)){//确保有交点
+        if ( (Math.pow((SA + SC),2) > Math.pow(view_w, 2) + Math.pow(view_h, 2))
+                &&(Math.pow(SA, 2) < Math.pow(view_w, 2) + Math.pow(view_h, 2))
+                &&(Math.pow(SC, 2) < Math.pow(view_w, 2) + Math.pow(view_h, 2))){//确保有交点,且交点在区域内
             double t = Math.pow(SA, 2) + Math.pow(view_w, 2) + Math.pow(view_h, 2) - Math.pow(SC, 2);
             double a = 4 * (Math.pow(view_w, 2) + Math.pow(view_h, 2));
             double b = -4 * view_h * t;
@@ -331,34 +336,79 @@ public class MainActivity extends AppCompatActivity {
                     double one = Math.pow(x1 - view_w, 2.0) + Math.pow(y1, 2.0);
                     double two = Math.pow(x2 - view_w, 2.0) + Math.pow(y2, 2.0);
                     if (Math.abs(one - SB ) > Math.abs(two - SB)){
-                        temy2 = y1;
-                        temx2 = x1;
-                    }else {
                         temy2 = y2;
                         temx2 = x2;
+                    }else {
+                        temy2 = y1;
+                        temx2 = x1;
                     }
                 }else if(y1 < 0 ){
                     temx2 = x2;
                     temy2 = y2;
-                }else{
+                }else if(y2 < 0){
                     temx2 = x1;
                     temy2 = y1;
+                }else{
+                    temx2 = 0;
+                    temy2 = 0;
                 }
             }
         }
 
         //用B，D画圆 ，C确定位置
-
-
-
-
-
-
+        if((Math.pow((SB + SD), 2) > Math.pow(view_h, 2) + Math.pow(view_w, 2))
+                &&(Math.pow(SB, 2) < Math.pow(view_h, 2) + Math.pow(view_w, 2))
+                &&(Math.pow(SD, 2) < Math.pow(view_h, 2) + Math.pow(view_w, 2))){
+            double t = Math.pow(view_w, 2) + Math.pow(SD, 2) - Math.pow(SB, 2) - Math.pow(view_h, 2);
+            double a = Math.pow(2 * view_h, 2) + Math.pow(2 * view_w, 2);
+            double b = 4 * view_h * t - 8 * view_h * Math.pow(view_w, 2);
+            double c = Math.pow(t, 2) - Math.pow(2 * view_w * SD, 2) + Math.pow(2 * view_w * view_h, 2);
+            double delte = Math.pow(b, 2) - 4 * a * c;
+            if(delte > 0){
+                double y1 = (-b + Math.sqrt(delte))/(2 * b);
+                double y2 = (-b - Math.sqrt(delte))/(2 * b);
+                double x1 = 0,x2 = 0;
+                if ( y1 > 0){
+                    x1 = Math.sqrt(Math.pow(SD, 2) - Math.pow(y1 - view_h, 2));
+                }
+                if (y2 > 0){
+                    x2 = Math.sqrt(Math.pow(SD, 2) - Math.pow(y2 - view_h, 2));
+                }
+                //有交点
+                if (y1>0||y2>0){
+                    ++count;
+                }
+                if(y1 > 0 & y2 >0){
+                    double one = Math.pow(x1 - view_w, 2.0) + Math.pow(y1 - view_h, 2.0);
+                    double two = Math.pow(x2 - view_w, 2.0) + Math.pow(y2 - view_h, 2.0);
+                    if (Math.abs(one - SD ) > Math.abs(two - SD)){
+                        temy3 = y2;
+                        temx3 = x2;
+                    }else {
+                        temy3 = y1;
+                        temx3 = x1;
+                    }
+                }else if(y1 < 0 ){
+                    temx3 = x2;
+                    temy3 = y2;
+                }else if(y2 < 0){
+                    temx3 = x1;
+                    temy3 = y1;
+                }else{
+                    temx3 = 0;
+                    temy3 = 0;
+                }
+            }
+        }
+        if (count!=0) {
+            xy[0] = (int) (temx1 + temx2 + temx3) / count;
+            xy[1] = (int) (temy1 + temy2 + temy3) / count;
+        }else {
+            xy[0] = 0;
+            xy[1] = 0;
+        }
         return xy;
-
     }
-
-
 
     private String[] filt_info(List<ScanResult> resultList){
 
@@ -415,8 +465,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
     public BroadcastReceiver mReceiver = new BroadcastReceiver(){
 
         /**
@@ -442,6 +490,8 @@ public class MainActivity extends AppCompatActivity {
                 //更新view中的X，Y；
 
                 int tems[] = sting2int(tem);
+
+                //TODO:strength2view
 
                 int tem_xy[] = get_xy(tems[0], tems[1], tems[2], tems[3]);
 
