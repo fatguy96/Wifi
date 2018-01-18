@@ -1,0 +1,5 @@
+<root>
+    <item name='android.Manifest.permission RESTART_PACKAGES'>
+        <annotation name='android.support.annotation.NonNull' />
+    </item>
+</root>
