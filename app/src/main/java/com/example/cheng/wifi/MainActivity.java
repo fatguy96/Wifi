@@ -227,12 +227,12 @@ public class MainActivity extends AppCompatActivity {
 
     private int strength2distance(int s)
     {
-        int tem = 0;
+        double tem;
+        double fenzi;
         //TODO: switch the strength to distance eg, wifi 100 map 1 m
-        if(s<100){
-
-        }
-        return tem;
+        fenzi = s/1000 - 21.98 - 20 * Math.log10(2400);
+        tem = Math.pow(10 ,fenzi/20);
+        return (int)tem;
     }
 
 
@@ -450,7 +450,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (sc.SSID.equals(AccessPoint_A)) {
 
-                int temp = WifiManager.calculateSignalLevel(sc.level,100);
+                int temp = WifiManager.calculateSignalLevel(sc.level,1000);
 
                 tem[0] = String.valueOf(temp);
 
@@ -458,7 +458,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (sc.SSID.equals(AccessPoint_B)) {
 
-                int temp = WifiManager.calculateSignalLevel(sc.level,100);
+                int temp = WifiManager.calculateSignalLevel(sc.level,1000);
 
                 tem[1] = String.valueOf(temp);
 
@@ -466,7 +466,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (sc.SSID.equals(AccessPoint_C)) {
 
-                int temp = WifiManager.calculateSignalLevel(sc.level,100);
+                int temp = WifiManager.calculateSignalLevel(sc.level,1000);
 
                 tem[2] = String.valueOf(temp);
 
@@ -474,7 +474,7 @@ public class MainActivity extends AppCompatActivity {
 
             if(sc.SSID.equals(AccessPoint_D)){
 
-                int temp = WifiManager.calculateSignalLevel(sc.level,100);
+                int temp = WifiManager.calculateSignalLevel(sc.level,1000);
 
                 tem[3] = String.valueOf(temp);
 
