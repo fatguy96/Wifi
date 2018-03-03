@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
     {
         double tem;
         double fenzi;
-        //TODO: switch the strength to distance eg, wifi 100 map 1 m
+        //TODO: 寻找合适的传播理论
         fenzi = s/1000 - 21.98 - 20 * Math.log10(2400);
         tem = Math.pow(10 ,fenzi/20);
         return (int)tem;
