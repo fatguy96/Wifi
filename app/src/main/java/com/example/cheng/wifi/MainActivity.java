@@ -230,8 +230,8 @@ public class MainActivity extends AppCompatActivity {
         double tem;
         double fenzi;
         //TODO: 寻找合适的传播理论
-        fenzi = s/1000 - 21.98 - 20 * Math.log10(2400);
-        tem = Math.pow(10 ,fenzi/20);
+        fenzi = (999-s)/(27);
+        tem = Math.pow(10 ,fenzi);
         return (int)tem;
     }
 
