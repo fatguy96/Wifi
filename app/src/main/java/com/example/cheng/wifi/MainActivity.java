@@ -230,6 +230,7 @@ public class MainActivity extends AppCompatActivity {
         double tem;
         double fenzi;
         //TODO: 寻找合适的传播理论
+        // 参考自：https://tech.meituan.com/mt-wifi-locate-practice-part1.html
         fenzi = (999-s)/(27);
         tem = Math.pow(10 ,fenzi);
         return (int)tem;
