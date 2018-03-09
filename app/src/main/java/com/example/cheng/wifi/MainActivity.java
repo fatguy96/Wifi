@@ -29,8 +29,8 @@ public class MainActivity extends AppCompatActivity {
 
     //实际场景中的宽:w和高:h
     //todo: 设定实际场景中的宽和高
-    private static final double really_w = 20;
-    private static final double really_h = 10;
+    private static final double really_w = 5;
+    private static final double really_h = 4;
 
     //view 中的宽w， 高h
     int view_w;
@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 0;
     private WifiManager mWifiManager;
     private Button show_to;
-    private TextView ap_x, ap_y, ap_z, ap_w;
+    private TextView ap_x, dis_x, ap_y, dis_y, ap_z, dis_z, ap_w, dis_w;
     private DrawView drawView;
 
     @Override
@@ -113,9 +113,13 @@ public class MainActivity extends AppCompatActivity {
         scaling_factor_w = view_w * 1.0/really_w;
         show_to = findViewById(R.id.get);
         ap_x = findViewById(R.id.ap_x);
+        dis_x = findViewById(R.id.dis_x);
         ap_y = findViewById(R.id.ap_y);
+        dis_y = findViewById(R.id.dis_y);
         ap_z = findViewById(R.id.ap_z);
+        dis_z = findViewById(R.id.dis_z);
         ap_w = findViewById(R.id.ap_w);
+        dis_w = findViewById(R.id.dis_w);
     }
 
     //打开wifi
@@ -171,13 +175,13 @@ public class MainActivity extends AppCompatActivity {
             {
                 resultList = mWifiManager.getScanResults();
                 String tem[] = filt_info(resultList);
-                show_info(tem);
 
                 //将字符串转化成int
                 int tems[] = sting2int(tem);
 
                 //将wifi强度转化成实际中的距离
                 double real_distance[] = wifi2distance(tems);
+                show_info(tem, real_distance);
 
                 //求出现实场景中大概的位置信息
                 double tem_xy[] = get_xy((int)real_distance[0], (int)real_distance[1],
@@ -198,12 +202,23 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
-    private void show_info(String[] tem)
+    private void show_info(String[] tem, double[] tem_num)
     {
+        for (int i=0;i <= 3; i++){
+
+            if (tem[i].equals("100")){
+                tem[i] = "找不到";
+            }
+
+        }
         ap_x.setText(tem[0]);
+        dis_x.setText(String.valueOf(tem_num[0]));
         ap_y.setText(tem[1]);
+        dis_y.setText(String.valueOf(tem_num[1]));
         ap_z.setText(tem[2]);
+        dis_z.setText(String.valueOf(tem_num[2]));
         ap_w.setText(tem[3]);
+        dis_w.setText(String.valueOf(tem_num[3]));
     }
 
     private int[] sting2int(String[] string)
@@ -225,15 +240,20 @@ public class MainActivity extends AppCompatActivity {
         return  distance;
     }
 
-    private int strength2distance(int s)
+    private double strength2distance(int s)
     {
-        double tem;
-        double fenzi;
-        //TODO: 寻找合适的传播理论
-        // 参考自：https://tech.meituan.com/mt-wifi-locate-practice-part1.html
-        fenzi = (999-s)/(27);
-        tem = Math.pow(10 ,fenzi);
-        return (int)tem;
+        if (s==100){
+            return -1.0;
+        }
+        else {
+            double tem;
+            double fenzi;
+            //TODO: 寻找合适的传播理论
+            // 参考自：https://tech.meituan.com/mt-wifi-locate-practice-part1.html
+            fenzi = (-42 - s) * 1.0 / (10 * 3.33);
+            tem = Math.pow(10, fenzi);
+            return tem;
+        }
     }
 
 
@@ -443,7 +463,7 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i=0;i <= 3; i++){
 
-            tem[i]=String.valueOf(i);
+            tem[i]=String.valueOf(100);
 
         }
 
@@ -451,35 +471,36 @@ public class MainActivity extends AppCompatActivity {
 
             if (sc.SSID.equals(AccessPoint_A)) {
 
-                int temp = WifiManager.calculateSignalLevel(sc.level,1000);
+//                int temp = WifiManager.calculateSignalLevel(sc.level,100);
 
-                tem[0] = String.valueOf(temp);
+                tem[0] = String.valueOf(sc.level);
 
             }
 
             if (sc.SSID.equals(AccessPoint_B)) {
 
-                int temp = WifiManager.calculateSignalLevel(sc.level,1000);
+//                int temp = WifiManager.calculateSignalLevel(sc.level,100);
 
-                tem[1] = String.valueOf(temp);
+                tem[1] = String.valueOf(sc.level);
 
             }
 
             if (sc.SSID.equals(AccessPoint_C)) {
 
-                int temp = WifiManager.calculateSignalLevel(sc.level,1000);
+//                int temp = WifiManager.calculateSignalLevel(sc.level,100);
 
-                tem[2] = String.valueOf(temp);
+                tem[2] = String.valueOf(sc.level);
 
             }
 
             if(sc.SSID.equals(AccessPoint_D)){
 
-                int temp = WifiManager.calculateSignalLevel(sc.level,1000);
+//                int temp = WifiManager.calculateSignalLevel(sc.level,100);
 
-                tem[3] = String.valueOf(temp);
+                tem[3] = String.valueOf(sc.level);
 
             }
+
 
         }
 
