@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
@@ -31,8 +32,9 @@ public class DrawView extends View{
             public void handleMessage(Message msg) {
 
                 if(msg.what == 0x123){
-                    currentX = msg.arg1;
-                    currentY = msg.arg2;
+                    Bundle bundle = msg.getData();
+                    currentX = bundle.getFloat("x");
+                    currentY = bundle.getFloat("y");
                     invalidate();
                 }
                 super.handleMessage(msg);
@@ -50,8 +52,9 @@ public class DrawView extends View{
             public void handleMessage(Message msg) {
 
                 if(msg.what == 0x123){
-                    currentX = msg.arg1;
-                    currentY = msg.arg2;
+                    Bundle bundle = msg.getData();
+                    currentX = bundle.getFloat("x");
+                    currentY = bundle.getFloat("y");
                     invalidate();
                 }
                 super.handleMessage(msg);

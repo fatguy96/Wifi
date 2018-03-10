@@ -188,14 +188,19 @@ public class MainActivity extends AppCompatActivity {
                         (int)real_distance[2], (int)real_distance[3]);
 
                 //将现实场景中的位置信息转换成view中的位置信息
-                int view_xy[] = real2view(tem_xy);
+                float view_xy[] = real2view(tem_xy);
 
                 //向自定义View中传递大概的位置信息
-                Message message = new Message();
-                message.what = 0x123;
-                message.arg1= view_xy[0] ;
-                message.arg2 = view_xy[1];
-                drawView.handler.sendMessage(message);
+                //只有得出的点存在的时候才进行更新
+                if (view_xy[0]!=0 && view_xy[1]!=0){
+                    Message message = new Message();
+                    Bundle bundle = new Bundle();
+                    message.what = 0x123;
+                    bundle.putFloat("x", view_xy[0]);
+                    bundle.putFloat("y", view_xy[1]);
+                    message.setData(bundle);
+                    drawView.handler.sendMessage(message);
+                }
             }
         }
 
@@ -256,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    //TODO: 有待商榷
     /**
      * 预设定的场景：
      *              really_w
@@ -274,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
      * @return int[2], 改点再view中的位置坐标
      * */
 
-    private double[] get_xy(int SA, int SB, int SC, int SD)
+    private double[] get_xy(double SA, double SB, double SC, double SD)
     {
         double xy[] = new double[2];
 
@@ -314,7 +319,7 @@ public class MainActivity extends AppCompatActivity {
         return xy;
     }
 
-    private double[] get_xy_one(int SA, int SB, int SD)
+    private double[] get_xy_one(double SA, double SB, double SD)
     {
         double tem[] = new double[2];
         tem[0] = 0; //x
@@ -335,7 +340,7 @@ public class MainActivity extends AppCompatActivity {
         return tem;
     }
 
-    private double[] get_xy_two(int SA, int SB, int SC)
+    private double[] get_xy_two(double SA, double SB, double SC)
     {
         //利用A，C点画圆求交，B确定位置
 
@@ -395,7 +400,7 @@ public class MainActivity extends AppCompatActivity {
         return tem;
     }
 
-    private double[] get_xy_three(int SB, int SC, int SD)
+    private double[] get_xy_three(double SB, double SC, double SD)
     {
         //用B，D画圆 ，C确定位置
 
@@ -508,10 +513,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private int[] real2view(double[] tem_xy){
-        int[] view = new int[2];
-        view[0] = (int)(tem_xy[0] * scaling_factor_w);
-        view[1] = (int)(tem_xy[1] * scaling_factor_h);
+    private float[] real2view(double[] tem_xy){
+        float[] view = new float[2];
+        view[0] = (float) (tem_xy[0] * scaling_factor_w);
+        view[1] = (float) (tem_xy[1] * scaling_factor_h);
         return view;
     }
 }
