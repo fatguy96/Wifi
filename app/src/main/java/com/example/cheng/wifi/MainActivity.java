@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     //实际场景中的宽:w和高:h
-    //todo: 设定实际场景中的宽和高
+    //todo: 设定实际场景中的宽(A-b)和高(A - D)
     private static final double really_w = 5;
     private static final double really_h = 4;
 
