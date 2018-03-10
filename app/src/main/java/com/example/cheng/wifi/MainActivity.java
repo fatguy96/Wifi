@@ -23,7 +23,7 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
-    //真实距离到view距离的映射系数
+    //真实距离到view距离的对应关系
     private double scaling_factor_w, scaling_factor_h;
 
 
