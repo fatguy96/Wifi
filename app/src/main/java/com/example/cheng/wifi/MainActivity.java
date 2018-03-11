@@ -8,11 +8,14 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.nfc.Tag;
 import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -24,6 +27,7 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String ATG = "MainActivity";
     //真实距离到view距离的对应关系
     private float scaling_factor_w, scaling_factor_h;
 
@@ -38,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     int view_h;
 
     //提供的4个AP
-    private static final String AccessPoint_A = "TP-LINK_5B3A";
+    private static final String AccessPoint_A = "AC_A";
     private static final String AccessPoint_B = "AC_B";
     private static final String AccessPoint_C = "AC_C";
     private static final String AccessPoint_D = "AC_D";
@@ -68,9 +72,16 @@ public class MainActivity extends AppCompatActivity {
 
         drawView = findViewById(R.id.drawView);
 
-        //获取view的长和宽
-        view_w = drawView.getWidth();
-        view_h = drawView.getHeight();
+        //用于获取view的长和宽
+        ViewTreeObserver viewTreeObserver = drawView.getViewTreeObserver();
+        viewTreeObserver.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                view_w = drawView.getHeight();
+                view_h = drawView.getWidth();
+                return true;
+            }
+        });
 
         mWifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
 
@@ -186,15 +197,16 @@ public class MainActivity extends AppCompatActivity {
 
                 // 求出现实场景中大概的位置信息
                 // TODO: 尝试作弊方法时，删除下面两行
-                double tem_xy[] = get_xy(real_distance[0], real_distance[1],
-                        real_distance[2], real_distance[3]);
+                //double tem_xy[] = get_xy(real_distance[0], real_distance[1],
+                //        real_distance[2], real_distance[3]);
 
                 //将现实场景中的位置信息转换成view中的位置信息
-                float view_xy[] = real2view(tem_xy);
+                //float view_xy[] = real2view(tem_xy);
 
                 //TODO: 尝试作弊方法, 取消下面注释
-                //view_xy = get_xy_no_way(real_distance[0],real_distance[1], real_distance[2], real_distance[3]);
-
+                float view_xy[] = get_xy_no_way(real_distance[0],real_distance[1], real_distance[2], real_distance[3]);
+                Log.i(ATG, String.valueOf(view_xy[0]));
+                Log.i(ATG, String.valueOf(view_xy[1]));
                 //向自定义View中传递大概的位置信息
                 //只有得出的点存在的时候才进行更新
                 if (view_xy[0]!=0 && view_xy[1]!=0){
@@ -469,16 +481,23 @@ public class MainActivity extends AppCompatActivity {
      * */
     private float[] get_xy_no_way(float SA, float SB, float SC, float SD)
     {
+        Log.i(ATG, "SA" + String.valueOf(SA));
+        Log.i(ATG, "SB" + String.valueOf(SB));
+        Log.i(ATG, "SC" + String.valueOf(SC));
+        Log.i(ATG, "SD" + String.valueOf(SD));
         float xy[] = new float[2];
         float fac_h, fac_w;
-        fac_h = (SC +  SD)/(SA + SB);
-        fac_w = (SB + SC)/(SA + SD);
+        fac_h = (float) ((SC + SD)*1.0/(SA + SB));
+        fac_w = (float) ((SB + SC)*1.0/(SA + SD));
+        Log.i(ATG, "fac_h" + String.valueOf(fac_h));
+        Log.i(ATG, "fac_w" + String.valueOf(fac_w));
+
+        Log.i(ATG, "view_w" + String.valueOf(view_w));
         xy[0] =  keep2point(view_w/(1 + fac_w));
         xy[1] = keep2point(view_h/(1 + fac_h));
+
         return xy;
     }
-
-
 
     private String[] filt_info(List<ScanResult> resultList)
     {
