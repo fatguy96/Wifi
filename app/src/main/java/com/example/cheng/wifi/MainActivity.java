@@ -473,8 +473,8 @@ public class MainActivity extends AppCompatActivity {
         float fac_h, fac_w;
         fac_h = (SC +  SD)/(SA + SB);
         fac_w = (SB + SC)/(SA + SD);
-        xy[0] =  view_w/(1 + fac_w);
-        xy[1] = view_h/(1 + fac_h);
+        xy[0] =  keep2point(view_w/(1 + fac_w));
+        xy[1] = keep2point(view_h/(1 + fac_h));
         return xy;
     }
 
