@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
@@ -24,7 +25,7 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity {
 
     //真实距离到view距离的对应关系
-    private double scaling_factor_w, scaling_factor_h;
+    private float scaling_factor_w, scaling_factor_h;
 
 
     //实际场景中的宽:w和高:h
@@ -37,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     int view_h;
 
     //提供的4个AP
-    private static final String AccessPoint_A = "AC_A";
+    private static final String AccessPoint_A = "TP-LINK_5B3A";
     private static final String AccessPoint_B = "AC_B";
     private static final String AccessPoint_C = "AC_C";
     private static final String AccessPoint_D = "AC_D";
@@ -109,8 +110,8 @@ public class MainActivity extends AppCompatActivity {
     //初始化
     private void init_view_button()
     {
-        scaling_factor_h = view_h * 1.0/really_h;
-        scaling_factor_w = view_w * 1.0/really_w;
+        scaling_factor_h = keep2point((float) (view_h * 1.0/really_h));
+        scaling_factor_w = keep2point((float) (view_w * 1.0/really_w));
         show_to = findViewById(R.id.get);
         ap_x = findViewById(R.id.ap_x);
         dis_x = findViewById(R.id.dis_x);
@@ -180,15 +181,19 @@ public class MainActivity extends AppCompatActivity {
                 int tems[] = sting2int(tem);
 
                 //将wifi强度转化成实际中的距离
-                double real_distance[] = wifi2distance(tems);
+                float real_distance[] = wifi2distance(tems);
                 show_info(tem, real_distance);
 
-                //求出现实场景中大概的位置信息
-                double tem_xy[] = get_xy((int)real_distance[0], (int)real_distance[1],
-                        (int)real_distance[2], (int)real_distance[3]);
+                // 求出现实场景中大概的位置信息
+                // TODO: 尝试作弊方法时，删除下面两行
+                double tem_xy[] = get_xy(real_distance[0], real_distance[1],
+                        real_distance[2], real_distance[3]);
 
                 //将现实场景中的位置信息转换成view中的位置信息
                 float view_xy[] = real2view(tem_xy);
+
+                //TODO: 尝试作弊方法, 取消下面注释
+                //view_xy = get_xy_no_way(real_distance[0],real_distance[1], real_distance[2], real_distance[3]);
 
                 //向自定义View中传递大概的位置信息
                 //只有得出的点存在的时候才进行更新
@@ -207,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
-    private void show_info(String[] tem, double[] tem_num)
+    private void show_info(String[] tem, float[] tem_num)
     {
         for (int i=0;i <= 3; i++){
 
@@ -236,13 +241,15 @@ public class MainActivity extends AppCompatActivity {
         return tems;
     }
 
-    private double[] wifi2distance(int[] strength)
+    private float[] wifi2distance(int[] strength)
     {
         double distance[] = new double[4];
+        float diff[] = new float[4];
         for(int i = 0; i <= 3; ++i){
             distance[i] = strength2distance(strength[i]);
+            diff[i] = keep2point((float)distance[i]);
         }
-        return  distance;
+        return  diff;
     }
 
     private double strength2distance(int s)
@@ -279,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
      * @return int[2], 改点再view中的位置坐标
      * */
 
-    private double[] get_xy(double SA, double SB, double SC, double SD)
+    private double[] get_xy(float SA, float SB, float SC, float SD)
     {
         double xy[] = new double[2];
 
@@ -327,8 +334,8 @@ public class MainActivity extends AppCompatActivity {
 
         if ( (SA + SB) > really_w && SA < really_w && SB < really_w){
             //x=(SA^2-SB^2+really_w^2)/(2*really_w)
-            tem[0] = (Math.pow((double) SA, 2.0) - Math.pow((double) SB, 2.0) + Math.pow(really_w, 2.0)) / (2 * really_w);
-            tem[1] = Math.pow((double) SA, 2.0) - Math.pow(tem[0], 2.0);
+            tem[0] = (Math.pow(SA, 2.0) - Math.pow( SB, 2.0) + Math.pow(really_w, 2.0)) / (2 * really_w);
+            tem[1] = Math.pow( SA, 2.0) - Math.pow(tem[0], 2.0);
 
             //其实下面的代码没有必要，只需要取正数就行
             double one = Math.pow(tem[0], 2.0) + Math.pow((tem[1] - really_h), 2.0);
@@ -456,6 +463,23 @@ public class MainActivity extends AppCompatActivity {
         return tem;
     }
 
+
+    /**
+     * 作弊方法，在固定的区域如果进行定位，根据4个AP的大小，直接随机到离AP最近的地方
+     * */
+    private float[] get_xy_no_way(float SA, float SB, float SC, float SD)
+    {
+        float xy[] = new float[2];
+        float fac_h, fac_w;
+        fac_h = (SC +  SD)/(SA + SB);
+        fac_w = (SB + SC)/(SA + SD);
+        xy[0] =  view_w/(1 + fac_w);
+        xy[1] = view_h/(1 + fac_h);
+        return xy;
+    }
+
+
+
     private String[] filt_info(List<ScanResult> resultList)
     {
 
@@ -515,9 +539,19 @@ public class MainActivity extends AppCompatActivity {
 
     private float[] real2view(double[] tem_xy){
         float[] view = new float[2];
-        view[0] = (float) (tem_xy[0] * scaling_factor_w);
-        view[1] = (float) (tem_xy[1] * scaling_factor_h);
+        view[0] = keep2point((float) tem_xy[0] * scaling_factor_w);
+        view[1] = keep2point((float) tem_xy[1] * scaling_factor_h);
         return view;
+    }
+
+    private float keep2point(float ft) {
+
+        int scale = 2;//设置位数
+        int roundingMode = 4;//表示四舍五入，可以选择其他舍值方式，例如去尾，等等.
+        BigDecimal bd = new BigDecimal(ft);
+        bd = bd.setScale(scale, roundingMode);
+        ft = bd.floatValue();
+        return ft;
     }
 }
 

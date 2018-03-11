@@ -103,5 +103,6 @@ public class DrawView extends View{
         Log.i(ATG, String.valueOf(getWidth()));
         Log.i(ATG, String.valueOf(getHeight()));
         canvas.drawCircle(currentX, currentY, 10, p);
+        canvas.drawText("("+String.valueOf(currentX)+","+String.valueOf(currentY)+")",currentX, currentY, p);
     }
 }
