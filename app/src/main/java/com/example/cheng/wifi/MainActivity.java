@@ -481,18 +481,14 @@ public class MainActivity extends AppCompatActivity {
      * */
     private float[] get_xy_no_way(float SA, float SB, float SC, float SD)
     {
-        Log.i(ATG, "SA" + String.valueOf(SA));
-        Log.i(ATG, "SB" + String.valueOf(SB));
-        Log.i(ATG, "SC" + String.valueOf(SC));
-        Log.i(ATG, "SD" + String.valueOf(SD));
+
         float xy[] = new float[2];
         float fac_h, fac_w;
-        fac_h = (float) ((SC + SD)*1.0/(SA + SB));
-        fac_w = (float) ((SB + SC)*1.0/(SA + SD));
-        Log.i(ATG, "fac_h" + String.valueOf(fac_h));
-        Log.i(ATG, "fac_w" + String.valueOf(fac_w));
+        //fac_h = (float) ((SC + SD)*1.0/(SA + SB));
+        fac_h = (float)Math.max(SD * 0.1/ SA, 0.1 * SC / SB);
+        //fac_w = (float) ((SB + SC)*1.0/(SA + SD));
+        fac_w = (float)Math.max(SB* 1.0 / SA, SC * 1.0 / SD);
 
-        Log.i(ATG, "view_w" + String.valueOf(view_w));
         xy[0] =  keep2point(view_w/(1 + fac_w));
         xy[1] = keep2point(view_h/(1 + fac_h));
 
