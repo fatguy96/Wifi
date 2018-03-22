@@ -99,9 +99,8 @@ public class DrawView extends View{
         canvas.drawCircle(0,getHeight(),10,p_point);
         canvas.drawText("D", 0f, getHeight()-5, p);
         //绘制当前位置
-
-        Log.i(ATG, String.valueOf(getWidth()));
-        Log.i(ATG, String.valueOf(getHeight()));
+        Log.i(ATG, String.valueOf(this.getWidth()));
+        Log.i(ATG, String.valueOf(this.getHeight()));
         canvas.drawCircle(currentX, currentY, 10, p);
         canvas.drawText("("+String.valueOf(currentX)+","+String.valueOf(currentY)+")",currentX, currentY, p);
     }
