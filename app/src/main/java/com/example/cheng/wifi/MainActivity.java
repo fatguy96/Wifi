@@ -484,22 +484,22 @@ public class MainActivity extends AppCompatActivity {
 
         float xy[] = new float[2];
         float fac_h, fac_w;
-        one_h = Math.abs(SD, SA);
-        two_h = Math.abs(SC, SB);
-        one_w = Math.abs(SB, SA);
-        two_w = Math.abs(SC, SD);
+        float one_h = Math.abs(SD - SA);
+        float two_h = Math.abs(SC - SB);
+        float one_w = Math.abs(SB - SA);
+        float two_w = Math.abs(SC - SD);
         if(one_h > two_h){
-             fac_h = (float)SD * 0.1/ SA;
+            fac_h = (float)(SD * 1.0/ SA);
         }else{
-             fac_h = (float)SC * 0.1/ SB;
+            fac_h = (float)(1.0 * SC / SB);
         }
-        if(one_w > two_w){
-             fac_w = (float)SB* 1.0 / SA;
+        if (one_w > two_w){
+            fac_w = (float)(SB* 1.0 / SA);
         }else{
-             fac_w = (float)SC* 1.0 / SD;
+            fac_w = (float)(SC*1.0 / SD);
         }
-        xy[0] =  keep2point(view_w * 1.0 / (1 + fac_w));
-        xy[1] = keep2point(view_h * 1.0 / (1 + fac_h));
+        xy[0] =  keep2point((float)(view_w*1.0/(1 + fac_w)));
+        xy[1] = keep2point((float)(view_h*1.0/(1 + fac_h)));
 
         return xy;
     }
